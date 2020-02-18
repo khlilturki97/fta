@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\League;
+use App\Repositories\LeagueRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class LeagueController extends Controller
 {
-    private $model;
+    private $repository;
 
-    public function __construct(League $league)
+    public function __construct(LeagueRepository $leagueRepository)
     {
-        $this->model = $league;
+        $this->repository = $leagueRepository;
     }
 
     /**
@@ -22,7 +23,9 @@ class LeagueController extends Controller
      */
     public function index()
     {
-        return response()->json($this->model->all());
+        return response()->json(
+            $this->repository->index()
+        );
 
     }
 
@@ -35,7 +38,7 @@ class LeagueController extends Controller
     public function store(Request $request)
     {
         return response()->json(
-            $this->model->create($request->all())
+            $this->repository->store($request->all())
         );
     }
 
@@ -48,7 +51,7 @@ class LeagueController extends Controller
     public function show($id)
     {
         return response()->json(
-            $this->model->where('id', '=', $id)->first()
+            $this->repository->show($id)
         );
     }
 
@@ -61,9 +64,9 @@ class LeagueController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $modelToUpdate = $this->model->where('id', $id)->firstOrFail();
-        $modelToUpdate->update($request->all());
-        return response()->json($modelToUpdate);
+        return response()->json(
+            $this->repository->update($request->all(), $id)
+        );
     }
 
     /**
@@ -74,17 +77,8 @@ class LeagueController extends Controller
      */
     public function destroy($id)
     {
-        $modelToDelete = $this->model->where('id', $id)->firstOrFail();
         return response()->json([
-            'success' => $modelToDelete->delete() ? 'yes' : 'no'
-        ]);
-    }
-
-    public function destroyByName($name)
-    {
-        $modelToDelete = $this->model->where('name', $name)->firstOrFail();
-        return response()->json([
-            'success' => $modelToDelete->delete() ? 'yes' : 'no'
+            'success' => $this->repository->destroy($id) ? 'yes' : 'no'
         ]);
     }
 }
