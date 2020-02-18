@@ -18,3 +18,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('/league', 'LeagueController')->except(['create','edit']);
+Route::resource('/club', 'ClubController')->except(['create','edit']);
